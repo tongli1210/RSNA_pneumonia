@@ -170,7 +170,7 @@ def create_tf_example(image_fp, image_anns, tmp_dir='/home/ltong/projects/Kaggle
     }))
     return tf_example
       
-def convert_rsna_to_tfrecords(data_dir, annotations_dir, set_name, label_csv, output_path):
+def convert_rsna_to_tfrecords(data_dir, annotations_dir, set_name, label_csv, output_path, sharding=False):
     """
     Convert RSNA dataset to TFRecords
     """ 
@@ -182,12 +182,28 @@ def convert_rsna_to_tfrecords(data_dir, annotations_dir, set_name, label_csv, ou
     anns = read_annotation_file(anns_csv_path) 
     image_fps, image_annotations = parse_dataset(data_dir=data_dir, anns=anns)    
 
-    for image_fp in image_fps:
-        image_anns = image_annotations[image_fp]
-        tf_example = create_tf_example(image_fp, image_anns)        
-        writer.write(tf_example.SerializeToString())
+    if sharding:
+        import contextlib2
+        from google3.third_party.tensorflow_models.object_detection.dataset_tools import tf_record_creation_util
+        num_shards=10
+        output_filebase='/home/ltong/projects/Kaggle/RSNA_pneumonia/src/myFasterRCNN/data/rsna_'+set_name+'.record'
+        
+        with contextlib2.ExitStack() as tf_record_close_stack:
+            output_tfrecords = tf_record_creation_util.open_sharded_output_tfrecords(
+                tf_record_close_stack, output_filebase, num_shards)
+            for index, image_fp in image_fps:
+                image_anns = image_annotations[image_fp]
+                tf_example = create_tf_example(image_fp, image_anns)
+                output_shard_index = index % num_shards
+                output_tfrecords[output_shard_index].write(tf_example.SerializeToString())
+   
+    else:
+        for image_fp in image_fps:
+            image_anns = image_annotations[image_fp]
+            tf_example = create_tf_example(image_fp, image_anns)        
+            writer.write(tf_example.SerializeToString())
 
-    writer.close()
+        writer.close()
     
 def main(_):
     if FLAGS.set not in SETS:
@@ -196,7 +212,8 @@ def main(_):
                               annotations_dir=FLAGS.annotations_dir,
                               set_name=FLAGS.set,
                               label_csv=FLAGS.label_csv, 
-                              output_path=FLAGS.output_path)
+                              output_path=FLAGS.output_path,
+                              sharding=True)
 
 if __name__ == "__main__":
     tf.app.run()
