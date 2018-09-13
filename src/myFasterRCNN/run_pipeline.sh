@@ -1,6 +1,7 @@
 # From the tensorflow/models/research/ directory
 export PYTHONPATH=$PYTHONPATH:`pwd`:`pwd`/slim
 
+CUDA_VISIBLE_DEVICES=1
 PIPELINE_CONFIG_PATH=/home/ltong/projects/Kaggle/RSNA_pneumonia/src/myFasterRCNN/models/model/faster_rcnn_resnet50_rsna.config
 MODEL_DIR=/home/ltong/projects/Kaggle/RSNA_pneumonia/src/myFasterRCNN/models/model
 NUM_TRAIN_STEPS=50000
