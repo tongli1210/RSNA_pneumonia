@@ -1,5 +1,7 @@
 # From the tensorflow/models/research/ directory
-PIPELINE_CONFIG_PATH=/home/ltong/projects/Kaggle/RSNA_pneumonia/src/myFasterRCNN/models/model/faster_rcnn_resnet50_pets.config
+export PYTHONPATH=$PYTHONPATH:`pwd`:`pwd`/slim
+
+PIPELINE_CONFIG_PATH=/home/ltong/projects/Kaggle/RSNA_pneumonia/src/myFasterRCNN/models/model/faster_rcnn_resnet50_rsna.config
 MODEL_DIR=/home/ltong/projects/Kaggle/RSNA_pneumonia/src/myFasterRCNN/models/model
 NUM_TRAIN_STEPS=50000
 NUM_EVAL_STEPS=2000
