@@ -94,13 +94,13 @@ def load_mask(image_anns, height, width):
                 classes_text.append(b'Opacity')
                 classes.append(1)
 
-    if ret == 0:
-        xmins.append(0)
-        xmaxs.append(1.0)
-        ymins.append(0)
-        ymaxs.append(1.0)
-        classes_text.append(b'Background')
-        classes.append(0)
+#     if ret == 0:
+#         xmins.append(0)
+#         xmaxs.append(1.0)
+#         ymins.append(0)
+#         ymaxs.append(1.0)
+#         classes_text.append(b'Background')
+#         classes.append(0)
 
     return xmins, xmaxs, ymins, ymaxs, classes_text, classes
 
