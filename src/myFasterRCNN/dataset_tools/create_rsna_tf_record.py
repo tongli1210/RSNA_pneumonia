@@ -94,13 +94,13 @@ def load_mask(image_anns, height, width):
                 classes_text.append(b'Opacity')
                 classes.append(1)
 
-    if ret == 0:
-        xmins.append(0)
-        xmaxs.append(1.0)
-        ymins.append(0)
-        ymaxs.append(1.0)
-        classes_text.append(b'Background')
-        classes.append(0)
+#     if ret == 0:
+#         xmins.append(0)
+#         xmaxs.append(1.0)
+#         ymins.append(0)
+#         ymaxs.append(1.0)
+#         classes_text.append(b'Background')
+#         classes.append(0)
 
     return xmins, xmaxs, ymins, ymaxs, classes_text, classes
 
@@ -147,9 +147,12 @@ def create_tf_example(image_fp, image_anns, tmp_dir='/home/ltong/projects/Kaggle
       
     im = PIL.Image.fromarray(image)
     im.save(filename)
-    
-    filename = filename.encode() #encode 
-    encoded_image_data = image.tostring() # Encoded image bytes
+     
+    with tf.gfile.GFile(filename, 'rb') as fid:
+        encoded_image_data = fid.read()
+     
+    filename = filename.encode('utf8') #encode 
+    #encoded_image_data = image.tostring() # Encoded image bytes
     image_format = b'jpg' # b'jpeg' or b'png'
     
     xmins, xmaxs, ymins, ymaxs, classes_text, classes =  load_mask(image_anns, height, width)
@@ -159,9 +162,8 @@ def create_tf_example(image_fp, image_anns, tmp_dir='/home/ltong/projects/Kaggle
       'image/width': dataset_util.int64_feature(width),
       'image/filename': dataset_util.bytes_feature(filename),
       'image/source_id': dataset_util.bytes_feature(filename),
-      #'image/encoded': dataset_util.bytes_feature(encoded_image_data),
+      'image/encoded': dataset_util.bytes_feature(encoded_image_data),
       'image/format': dataset_util.bytes_feature(image_format),
-      #'image/format': tf.FixedLenFeature((), tf.string, default_value='raw'),
       'image/object/bbox/xmin': dataset_util.float_list_feature(xmins),
       'image/object/bbox/xmax': dataset_util.float_list_feature(xmaxs),
       'image/object/bbox/ymin': dataset_util.float_list_feature(ymins),
